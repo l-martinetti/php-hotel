@@ -1,44 +1,54 @@
 <?php
 
-    $hotels = [
+$hotels = [
+    [
+        'name' => 'Hotel Belvedere',
+        'description' => 'Hotel Belvedere Descrizione',
+        'parking' => true,
+        'vote' => 4,
+        'distance_to_center' => 10.4
+    ],
+    [
+        'name' => 'Hotel Futuro',
+        'description' => 'Hotel Futuro Descrizione',
+        'parking' => true,
+        'vote' => 2,
+        'distance_to_center' => 2
+    ],
+    [
+        'name' => 'Hotel Rivamare',
+        'description' => 'Hotel Rivamare Descrizione',
+        'parking' => false,
+        'vote' => 1,
+        'distance_to_center' => 1
+    ],
+    [
+        'name' => 'Hotel Bellavista',
+        'description' => 'Hotel Bellavista Descrizione',
+        'parking' => false,
+        'vote' => 5,
+        'distance_to_center' => 5.5
+    ],
+    [
+        'name' => 'Hotel Milano',
+        'description' => 'Hotel Milano Descrizione',
+        'parking' => true,
+        'vote' => 2,
+        'distance_to_center' => 50
+    ],
+];
 
-        [
-            'name' => 'Hotel Belvedere',
-            'description' => 'Hotel Belvedere Descrizione',
-            'parking' => true,
-            'vote' => 4,
-            'distance_to_center' => 10.4
-        ],
-        [
-            'name' => 'Hotel Futuro',
-            'description' => 'Hotel Futuro Descrizione',
-            'parking' => true,
-            'vote' => 2,
-            'distance_to_center' => 2
-        ],
-        [
-            'name' => 'Hotel Rivamare',
-            'description' => 'Hotel Rivamare Descrizione',
-            'parking' => false,
-            'vote' => 1,
-            'distance_to_center' => 1
-        ],
-        [
-            'name' => 'Hotel Bellavista',
-            'description' => 'Hotel Bellavista Descrizione',
-            'parking' => false,
-            'vote' => 5,
-            'distance_to_center' => 5.5
-        ],
-        [
-            'name' => 'Hotel Milano',
-            'description' => 'Hotel Milano Descrizione',
-            'parking' => true,
-            'vote' => 2,
-            'distance_to_center' => 50
-        ],
+$parking_requested = false;
 
-    ];
+if (isset($_GET['parking']) && $_GET['parking'] == "on") {
+    $parking_requested = true;
+}
+
+$minimum_vote = 0;
+
+if(isset($_GET['minimum_vote']) && is_numeric($_GET['minimum_vote']) && $_GET['minimum_vote'] >= 0 && $_GET['minimum_vote'] <= 5){
+    $minimum_vote = (int)$_GET['minimum_vote'];
+}
 
 ?>
 <!DOCTYPE html>
@@ -55,44 +65,64 @@
 </head>
 <body>
 
-<h1>Lista hotel</h1>
+<h1 class='m-2 text-center'>Hotels</h1>
+<hr>
 
-<?php
+<!-- Form di filtraggio -->
+<form method="GET" class="w-50 mx-auto my-4 d-flex justify-content-between">
+    <div class="form-control">
+        <label for="parking">Parcheggio</label>
+        <input type="checkbox" id="parking" name="parking">
+    </div>
 
-?>
+    <div class="form-control mx-3">
+        <label for="minimum_vote">Voto minimo</label>
+        <input id="minimum_vote" name="minimum_vote" type="number" min="1" max="5">
+    </div>
 
-<table class="table">
+    <button type="submit" class="btn btn-primary">Filtra</button>
+</form>
+
+<!-- Tabella -->
+<table class="table w-75 mx-auto mt-4">
   <thead>
     <tr>
         <?php 
-
         foreach($hotels[0] as $key => $value) {
-            $key = ucfirst($key);
-            echo "<th scope='col'>$key</th>";
+            echo "<th scope='col'>" . ucfirst($key) . "</th>";
         }
-
-      ?>
+        ?>
     </tr>
   </thead>
   <tbody>
-            <?php
+        <?php
+        foreach ($hotels as $hotel) {
 
-        foreach($hotels as $hotel){
-            
-            foreach($hotel as $key => $value){
-                
-                if ($key == 'parking' && $value == true){
-                    echo "<td>Si</td>";
-                } elseif ($key == 'parking' && $value == false) {
-                    echo "<td>No</td>";
+            // controllo parcheggio
+            if($parking_requested) {
+                if(!$hotel['parking'] ){
+                    
+                    continue;
+                }
+            }
+
+            // controllo voto
+            if($hotel['vote'] < $minimum_vote ){
+
+                continue;
+            }
+
+            echo "<tr>";
+            foreach ($hotel as $key => $value) {
+                if ($key == 'parking') {
+                    echo "<td>" . ($value ? 'Si' : 'No') . "</td>";
                 } else {
                     echo "<td>$value</td>";
                 }
             }
-
-           echo "<tr></tr>";  
+            echo "</tr>";  
         }
-            ?>
+        ?>
   </tbody>
 </table>
     
